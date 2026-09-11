@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 
+const errorHandler = require("./middlewares/errorHandler");
+
 const app = express();
 
 app.use(cors());
@@ -13,5 +15,7 @@ app.get("/", (req, res) => {
     message: "JobTrack API is running 🚀",
   });
 });
+
+app.use(errorHandler);
 
 module.exports = app;
