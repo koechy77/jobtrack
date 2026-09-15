@@ -43,16 +43,16 @@ const userSchema = new mongoose.Schema(
       select: false,
     },
 
-    confirmPassword: {
-      type: String,
-      required: [true, "Please confirm your password"],
-      validate: {
-        validator: function (el) {
-          return el === this.password;
-        },
-        message: "Passwords do not match",
-      },
-    },
+    // confirmPassword: {
+    //   type: String,
+    //   required: [true, "Please confirm your password"],
+    //   validate: {
+    //     validator: function (el) {
+    //       return el === this.password;
+    //     },
+    //     message: "Passwords do not match",
+    //   },
+    // },
 
     role: {
       type: String,
@@ -70,12 +70,11 @@ const userSchema = new mongoose.Schema(
   },
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
   this.password = await bcrypt.hash(this.password, 12);
   this.confirmPassword = undefined;
-  next();
 });
 
 module.exports = userSchema;

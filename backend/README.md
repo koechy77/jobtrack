@@ -63,6 +63,12 @@ NODE_ENV=development
 DATABASE_URL=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=90d
+EMAIL_HOST=your_smtp_host
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=your_smtp_username
+EMAIL_PASSWORD=your_smtp_password
+EMAIL_FROM=your_from_email
 ```
 
 ## Installation
@@ -85,21 +91,40 @@ Production mode:
 npm start
 ```
 
+## Authentication API
+
+The authentication routes are available under `/api/v1/auth`:
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| POST | `/signup` | Creates a user and sends a verification email. Returns `201` after email delivery. |
+| GET | `/verify-email?token=<token>` | Verifies a user's email address. |
+| POST | `/login` | Returns an access token for a verified user and sets a refresh-token cookie. |
+| POST | `/refresh` | Rotates the refresh-token cookie and returns a new access token. |
+| POST | `/logout` | Revokes the refresh token and clears its cookie. |
+
+Signup request example:
+
+```json
+{
+	"name": "Jane Doe",
+	"email": "jane@example.com",
+	"password": "your-password"
+}
+```
+
 ## Notes
 
-This backend currently contains the foundation for authentication and database setup, including:
+This backend currently contains authentication and database setup, including:
 
 - user and refresh token schemas/models
 - token generation utilities
-- signup and email verification controller placeholders
+- signup and email verification flows
 - centralized error handling
-
-The project is in an early backend-setup stage and is ready to be extended with routes, auth logic, and controller logic for the full JobTrack feature set.
 
 ## Current Status
 
 - Server bootstraps successfully
 - MongoDB connection logic is configured
 - Express app is initialized and running
-- Authentication-related scaffolding is in place
-- Routes are still pending implementation
+- Authentication routes and controllers are implemented

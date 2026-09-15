@@ -17,6 +17,7 @@ const refreshTokenSchema = new mongoose.Schema(
     expiresAt: {
       type: Date,
       required: true,
+      index: { expires: 0 }, // This will automatically remove the document after the specified time
     },
 
     revoked: {

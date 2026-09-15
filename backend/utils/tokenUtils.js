@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const RefreshToken = require("../models/refreshTokenModel");
+const RefreshToken = require("../src/models/refreshTokenModel");
 
 const generateRefreshToken = () => {
   return crypto.randomBytes(64).toString("hex");

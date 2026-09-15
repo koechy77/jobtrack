@@ -30,7 +30,8 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message, 400);
 };
 
-const errorhandler = (err, req, res, next) => {
+const errorhandler = (err, req, res) => {
+  console.error(err.message);
   if (err.name === "JsonWebTokenError") {
     err = handleJWTError();
   }
