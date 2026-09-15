@@ -1,4 +1,4 @@
-const AppError = require("../utils/appError");
+const AppError = require("../../utils/AppError");
 
 const handleJWTExpiredError = () => {
   return new AppError("Your session has expired. Please log in again.", 401);
@@ -31,15 +31,6 @@ const handleValidationErrorDB = (err) => {
 };
 
 const errorhandler = (err, req, res, next) => {
-  if (process.env.NODE_ENV === "development") {
-    return res.status(err.statuscode || 500).json({
-      status: err.status || "error",
-      error: err,
-      message: err.message,
-      stack: err.stack,
-    });
-  }
-
   if (err.name === "JsonWebTokenError") {
     err = handleJWTError();
   }
@@ -58,6 +49,15 @@ const errorhandler = (err, req, res, next) => {
 
   if (err.name === "ValidationError") {
     err = handleValidationErrorDB(err);
+  }
+
+  if (process.env.NODE_ENV === "development") {
+    return res.status(err.statuscode || 500).json({
+      status: err.status || "error",
+      error: err,
+      message: err.message,
+      stack: err.stack,
+    });
   }
 
   if (err.isOperational) {
