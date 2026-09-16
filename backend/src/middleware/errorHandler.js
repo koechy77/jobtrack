@@ -1,17 +1,17 @@
 const AppError = require("../../utils/AppError");
 
 const handleJWTExpiredError = () => {
-  return new AppError("Your session has expired. Please log in again.", 401);
+  throw new AppError("Your session has expired. Please log in again.", 401);
 };
 
 const handleJWTError = () => {
-  return new AppError("Invalid token. Please log in again.", 401);
+  throw new AppError("Invalid token. Please log in again.", 401);
 };
 
 const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}`;
 
-  return new AppError(message, 400);
+  throw new AppError(message, 400);
 };
 
 const handleDuplicateFieldsDB = (err) => {
@@ -19,7 +19,7 @@ const handleDuplicateFieldsDB = (err) => {
 
   const message = `Duplicate field value: ${value}. Please use another value.`;
 
-  return new AppError(message, 400);
+  throw new AppError(message, 400);
 };
 
 const handleValidationErrorDB = (err) => {
@@ -27,7 +27,7 @@ const handleValidationErrorDB = (err) => {
     .map((error) => error.message)
     .join(". ");
 
-  return new AppError(message, 400);
+  throw new AppError(message, 400);
 };
 
 const errorhandler = (err, req, res) => {
