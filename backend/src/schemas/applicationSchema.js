@@ -14,6 +14,11 @@ const applicationSchema = new mongoose.Schema(
       required: true,
     },
 
+    resume: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Resume",
+    },
+
     jobTitle: {
       type: String,
       required: [true, "Job title is required"],

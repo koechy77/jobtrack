@@ -1,73 +1,43 @@
 # JobTrack Backend
 
-This is the backend API for the JobTrack application. It is built with Node.js, Express, and MongoDB using Mongoose, and it currently focuses on user authentication, email verification, and token-based session management.
+The JobTrack backend is a Node.js API for authentication, job tracking, and resume management. It uses Express, MongoDB, and Mongoose, with JWT access tokens and HTTP-only refresh-token cookies.
 
 ## Features
 
-- Express server setup with JSON parsing, CORS, cookie support, and request logging
-- MongoDB connection via Mongoose
-- User signup, login, logout, and token refresh flow
-- Email verification for newly registered users
-- JWT access-token protection for authenticated routes
-- Secure refresh-token cookies with revocation support
-- Centralized error handling and application-level validation
-- Domain models for users, companies, and job applications
+- User signup, email verification, login, logout, and token refresh
+- JWT-protected routes with refresh-token rotation and revocation
+- MongoDB persistence through Mongoose models and schemas
+- Job application support with company and resume references
+- Authenticated resume uploads with PDF and DOCX support
+- Static serving of uploaded resume files
+- Centralized application error handling
+- CORS, JSON parsing, cookies, and Morgan request logging
 
 ## Tech Stack
 
-- Node.js
-- Express
-- MongoDB + Mongoose
-- JWT
-- bcryptjs
+- Node.js and Express
+- MongoDB and Mongoose
+- JWT and bcryptjs
 - Nodemailer
-- cookie-parser
-- CORS
-- Morgan
-- dotenv
+- Multer
+- express-validator
+- cookie-parser, CORS, Morgan, and dotenv
 
-## Project Structure
+## Getting Started
 
-```text
-backend/
-├── src/
-│   ├── app.js
-│   ├── server.js
-│   ├── config/
-│   │   └── db.js
-│   ├── controllers/
-│   │   └── authController.js
-│   ├── middleware/
-│   │   ├── authMiddleware.js
-│   │   └── errorHandler.js
-│   ├── models/
-│   │   ├── applicationModel.js
-│   │   ├── companyModel.js
-│   │   ├── refreshTokenModel.js
-│   │   └── userModel.js
-│   ├── routes/
-│   │   └── authRoutes.js
-│   └── schemas/
-│       ├── applicationSchema.js
-│       ├── companySchema.js
-│       ├── refreshTokenSchema.js
-│       └── userSchema.js
-├── utils/
-│   ├── AppError.js
-│   ├── cookieUtils.js
-│   ├── email.js
-│   └── tokenUtils.js
-├── .env
-├── .gitignore
-├── package.json
-├── package-lock.json
-├── README.md
-└── .env.example (if used in your local setup)
+### Prerequisites
+
+- Node.js 18 or newer
+- A MongoDB database
+- SMTP credentials for email verification
+
+### Installation
+
+```bash
+npm install
 ```
 
-## Environment Variables
-
-Create a `.env` file in the project root with the following values:
+Create a `.env` file in the project root:
 
 ```env
 PORT=5000
@@ -83,40 +53,49 @@ EMAIL_PASSWORD=your_smtp_password
 EMAIL_FROM=your_from_email
 ```
 
-## Installation
-
-```bash
-npm install
-```
-
-## Run the Server
-
-Development mode:
+Start the API in development mode with:
 
 ```bash
 npm run dev
 ```
 
-Production mode:
+Start it normally with:
 
 ```bash
 npm start
 ```
 
-## API Overview
+The default port is `5000`. Uploaded files are served from `/uploads` and stored in `uploads/resumes`.
 
-The app exposes the authentication service under `/api/v1/auth`.
+## API
+
+All API routes are versioned under `/api/v1`. Protected routes require:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+### Authentication
 
 | Method | Endpoint | Description |
 | --- | --- | --- |
-| POST | `/api/v1/auth/signup` | Registers a new user and sends an email verification link. |
-| GET | `/api/v1/auth/verify-email?token=<token>` | Verifies a user's email using the token from the email link. |
-| POST | `/api/v1/auth/login` | Authenticates a verified user and returns an access token. Also sets the refresh-token cookie. |
-| POST | `/api/v1/auth/refresh` | Validates the refresh-token cookie and rotates it to issue a new access token. |
+| POST | `/api/v1/auth/signup` | Registers a user and sends an email verification link. |
+| GET | `/api/v1/auth/verify-email?token=<token>` | Verifies a user's email address. |
+| POST | `/api/v1/auth/login` | Authenticates a verified user and sets a refresh-token cookie. |
+| POST | `/api/v1/auth/refresh` | Rotates the refresh token and returns a new access token. |
 | POST | `/api/v1/auth/logout` | Revokes the refresh token and clears the cookie. |
-| GET | `/api/v1/auth/me` | Protected route that returns the authenticated user's profile access confirmation. |
+| GET | `/api/v1/auth/me` | Protected authentication check. |
 
-### Signup Request Example
+### Resumes
+
+Resume routes require authentication. Uploads use `multipart/form-data` with a file field named `resume` and an optional `name` field.
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| POST | `/api/v1/resumes` | Uploads a PDF or DOCX resume. Maximum size: 5 MB. |
+| PATCH | `/api/v1/resumes/:id/default` | Sets one of the user's resumes as the default. |
+
+### Signup Example
 
 ```json
 {
@@ -126,22 +105,26 @@ The app exposes the authentication service under `/api/v1/auth`.
 }
 ```
 
-### Example Auth Header for Protected Routes
+## Project Structure
 
-```http
-Authorization: Bearer <access_token>
+```text
+backend/
+├── src/
+│   ├── app.js                 # Express app and route registration
+│   ├── server.js              # Database connection and server startup
+│   ├── config/                # Database configuration
+│   ├── controllers/           # Request handlers
+│   ├── middleware/            # Auth, upload, validation, and errors
+│   ├── models/                # Mongoose models
+│   ├── routes/                # API route definitions
+│   └── schemas/               # Mongoose schemas
+├── uploads/resumes/           # Stored resume uploads
+├── utils/                     # Errors, cookies, email, and tokens
+├── package.json
+├── package-lock.json
+└── README.md
 ```
 
-## Current Status
+## Status
 
-The backend is currently in the authentication and account-management phase. It includes:
-
-- user model and schema with encrypted password handling
-- email verification flow
-- JWT-based access tokens and refresh-token rotation
-- protected-route middleware
-- backend models for companies and job applications
-
-## Notes
-
-This project is still evolving toward full job-tracking functionality. The next phase is expected to include CRUD APIs for job applications, company management, and user dashboard features.
+Authentication and the first resume-management endpoints are implemented. Job application, company, interview, activity, notification, and dashboard functionality remains under active development.
